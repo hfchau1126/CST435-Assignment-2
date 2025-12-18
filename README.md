@@ -14,9 +14,9 @@ This project implements a parallel image processing pipeline that applies a sequ
   - `benchmark.py`: Runs performance comparison
   - `create_subset.py`: Helper to create dataset subset
 - `data/`: Directory for input (raw) and output (processed) images
-  - food-101
-  - processed
-  - raw
+  - food-101 (dataset)
+  - processed (empty before run)
+  - raw (empty before run)
 - `config.yaml`: Configuration settings
 - `requirements.txt`: Python dependencies
 
@@ -39,4 +39,5 @@ python scripts/benchmark.py
 ```
 
 Outputs will be saved to `data/processed`.
+
 
