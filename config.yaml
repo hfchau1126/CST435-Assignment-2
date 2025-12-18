@@ -1,0 +1,10 @@
+input_path: "data/raw"
+output_path: "data/processed"
+parameters:
+  brightness_factor: 1.2
+  filters:
+    - grayscale
+    - gaussian_blur
+    - sobel_edge_detection
+    - sharpen
+    - adjust_brightness
