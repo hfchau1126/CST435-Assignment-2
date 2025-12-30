@@ -9,6 +9,7 @@ This project implements a parallel image processing pipeline that applies a sequ
   - `sequential.py`: Logic for sequential execution
   - `multiprocessing_module.py`: Logic for multiprocessing execution
   - `concurrent_futures_module.py`: Logic for concurrent futures execution
+  - `metrics.py`: calculations for Speedup and Efficiency
   - `utils.py`: Helper functions for I/O
 - `scripts/`: Executable scripts
   - `benchmark.py`: Runs performance comparison
@@ -39,5 +40,17 @@ python scripts/benchmark.py
 ```
 
 Outputs will be saved to `data/processed`.
+
+## Performance Metrics
+
+The benchmark calculates **Theoretical Speedup** and **Efficiency** using **Amdahl's Law** with a fixed sequential fraction ($f=0.05$).
+
+**Formulas:**
+- **Speedup**: $S = \frac{1}{f + \frac{1-f}{P}}$
+- **Efficiency**: $E = \frac{S}{P}$
+
+Where:
+- $f = 0.05$ (Sequential Fraction)
+- $P$ = Number of Workers
 
 
