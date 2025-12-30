@@ -29,7 +29,7 @@ def get_image_files(directory):
 
 # Wrapper for processing a single image
 def process_single_image(args):
-    input_path, output_dir = args
+    input_path, output_dir, prefix = args
     filename = os.path.basename(input_path)
     
     # Load
@@ -41,7 +41,7 @@ def process_single_image(args):
     try:
         result = image_processing.apply_filters(img)
         
-        output_path = os.path.join(output_dir, f"processed_{filename}")
+        output_path = os.path.join(output_dir, f"processed_{prefix}_{filename}")
         save_image(result, output_path)
     except Exception as e:
         print(f"Failed to process {filename}: {e}")
