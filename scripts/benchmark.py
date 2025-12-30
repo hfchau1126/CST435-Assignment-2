@@ -11,6 +11,7 @@ from src import sequential
 from src import multiprocessing_module
 from src import concurrent_futures_module
 from src import utils
+from src import metrics
 
 def load_config(config_path="config.yaml"):
     try:
@@ -18,15 +19,13 @@ def load_config(config_path="config.yaml"):
             return yaml.safe_load(f)
     except Exception as e:
         print(f"Error loading config: {e}. Using defaults.")
-        return {"input_path": "data/raw", "output_path": "data/processed"}
+        return {"input_path": "data", "output_path": "data/processed"}
 
 def run_benchmark():
-    # Load config
     config = load_config()
-    input_dir = config.get("input_path", "data/raw")
+    input_dir = config.get("input_path", "data")
     output_dir = config.get("output_path", "data/processed")
-    
-    # Check if data exists
+
     if not os.path.exists(input_dir):
         print(f"Error: Input directory {input_dir} not found.")
         return
@@ -34,41 +33,79 @@ def run_benchmark():
     images = utils.get_image_files(input_dir)
     num_images = len(images)
     print(f"Running benchmark with {num_images} images from {input_dir}...")
-    
+
+    print(f"Using Amdahl's Law with Sequential Fraction (f) = {metrics.SEQUENTIAL_FRACTION}")
+
+    # Helper to print intermediate tables
+    def print_mode_table(title, subset_results):
+        print(f"\nResults for {title}")
+        print(f"{'Workers':<10} | {'Time (s)':<10} | {'Speedup':<10} | {'Efficiency':<10}")
+        print("-" * 55)
+        
+        for _, workers, duration in subset_results:
+            speedup = metrics.calculate_amdahl_speedup(workers)
+            efficiency = metrics.calculate_efficiency(speedup, workers)
+            
+            print(f"{workers:<10} | {duration:<10.4f} | {speedup:<10.2f} | {efficiency:<10.2f}")
+
     if os.path.exists(output_dir):
-        shutil.rmtree(output_dir)
-    os.makedirs(output_dir)
+        for i in range(3):
+            try:
+                shutil.rmtree(output_dir)
+                break
+            except OSError as e:
+                print(f"Cleanup attempt {i+1} failed: {e}. Retrying...")
+                time.sleep(1)
+                
+    os.makedirs(output_dir, exist_ok=True)
     
     results = []
     
     # 1. Sequential
+    sequential_results = []
     print("\n--- Running Sequential ---")
-    duration = sequential.run_sequential(images, output_dir)
-    results.append(("Sequential", 1, duration))
+    duration = sequential.run_sequential(images, output_dir, prefix="sequential")
+    entry = ("Sequential", 1, duration)
+    results.append(entry)
+    sequential_results.append(entry)
+    
+    print_mode_table("Sequential", sequential_results)
     
     # 2. Multiprocessing
-    for workers in [2, 4, 8]:
+    mp_results = []
+    for workers in [2, 4, 8, 16]:
         print(f"\n--- Running Multiprocessing (Workers={workers}) ---")
-        duration = multiprocessing_module.run_multiprocessing(images, output_dir, workers)
-        results.append(("Multiprocessing", workers, duration))
+        duration = multiprocessing_module.run_multiprocessing(images, output_dir, workers, prefix="mp")
+        entry = ("Multiprocessing", workers, duration)
+        results.append(entry)
+        mp_results.append(entry)
+        
+    print_mode_table("Multiprocessing", mp_results)
         
     # 3. Futures
-    for workers in [2, 4, 8]:
+    futures_results = []
+    for workers in [2, 4, 8, 16]:
         print(f"\n--- Running Futures (Workers={workers}) ---")
-        duration = concurrent_futures_module.run_futures(images, output_dir, workers)
-        results.append(("Futures", workers, duration))
+        duration = concurrent_futures_module.run_futures(images, output_dir, workers, prefix="futures")
+        entry = ("Futures", workers, duration)
+        results.append(entry)
+        futures_results.append(entry)
         
-    # Performance Analysis
-    print("\n" + "="*50)
-    print(f"{'Mode':<20} | {'Workers':<10} | {'Time (s)':<10} | {'Speedup':<10}")
-    print("-" * 50)
-    
-    base_time = results[0][2]
+    print_mode_table("Futures", futures_results)
+        
+    # Final Analysis
+    print("FINAL SUMMARY")
+    print(f"{'Mode':<20} | {'Workers':<10} | {'Time (s)':<10} | {'Speedup':<10} | {'Efficiency':<10}")
+    print("-" * 75)
     
     for mode, workers, duration in results:
-        speedup = base_time / duration if duration > 0 else 0
-        print(f"{mode:<20} | {workers:<10} | {duration:<10.4f} | {speedup:<10.2f}x")
-    print("="*50)
+        speedup = metrics.calculate_amdahl_speedup(workers)
+        efficiency = metrics.calculate_efficiency(speedup, workers)
+            
+        speedup_str = f"{speedup:.2f}x"
+        efficiency_str = f"{efficiency:.2f}"
+        print(f"{mode:<20} | {workers:<10} | {duration:<10.4f} | {speedup_str:<10} | {efficiency_str:<10}")
+    print("="*75)
 
 if __name__ == "__main__":
     run_benchmark()
