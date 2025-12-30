@@ -33,7 +33,7 @@ def sobel_edge_detection(image_array):
     magnitude = magnitude / magnitude.max() * 255
     return magnitude.astype(np.uint8)
 
-# Sharpen image using a kernel.
+# Sharpen image using a kernel
 def sharpen(image_array):
     kernel = np.array([[0, -1, 0], [-1, 5, -1], [0, -1, 0]])
     return apply_convolution(image_array, kernel)
