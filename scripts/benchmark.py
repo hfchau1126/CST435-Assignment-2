@@ -34,19 +34,23 @@ def run_benchmark():
     num_images = len(images)
     print(f"Running benchmark with {num_images} images from {input_dir}...")
 
-    print(f"Using Amdahl's Law with Sequential Fraction (f) = {metrics.SEQUENTIAL_FRACTION}")
+    print(f"Using Amdahl's Law with Theoretical Sequential Fraction (f) = {metrics.THEORETICAL_SEQUENTIAL_FRACTION}")
 
     # Helper to print intermediate tables
-    def print_mode_table(title, subset_results):
+    def print_mode_table(title, subset_results, t_seq):
         print(f"\nResults for {title}")
-        print(f"{'Workers':<10} | {'Time (s)':<10} | {'Speedup':<10} | {'Efficiency':<10}")
-        print("-" * 55)
+        header = f"{'Workers':<10} | {'Time (s)':<10} | {'Actual S':<10} | {'Theo S':<10} | {'Diff':<10} | {'Estimated P':<10} | {'Efficiency':<10}"
+        print(header)
+        print("-" * len(header))
         
         for _, workers, duration in subset_results:
-            speedup = metrics.calculate_amdahl_speedup(workers)
-            efficiency = metrics.calculate_efficiency(speedup, workers)
+            actual_speedup = metrics.calculate_actual_speedup(t_seq, duration)
+            theo_speedup = metrics.calculate_theoretical_speedup(workers)
+            diff = theo_speedup - actual_speedup
+            p_val = metrics.calculate_parallel_fraction(actual_speedup, workers)
+            efficiency = metrics.calculate_efficiency(actual_speedup, workers)
             
-            print(f"{workers:<10} | {duration:<10.4f} | {speedup:<10.2f} | {efficiency:<10.2f}")
+            print(f"{workers:<10} | {duration:<10.4f} | {actual_speedup:<10.2f} | {theo_speedup:<10.2f} | {diff:<10.2f} | {p_val:<10.4f} | {efficiency:<10.2f}")
 
     if os.path.exists(output_dir):
         for i in range(3):
@@ -65,11 +69,12 @@ def run_benchmark():
     sequential_results = []
     print("\n--- Running Sequential ---")
     duration = sequential.run_sequential(images, output_dir, prefix="sequential")
+    t_sequential = duration
     entry = ("Sequential", 1, duration)
     results.append(entry)
     sequential_results.append(entry)
     
-    print_mode_table("Sequential", sequential_results)
+    print_mode_table("Sequential", sequential_results, t_sequential)
     
     # 2. Multiprocessing
     mp_results = []
@@ -80,7 +85,7 @@ def run_benchmark():
         results.append(entry)
         mp_results.append(entry)
         
-    print_mode_table("Multiprocessing", mp_results)
+    print_mode_table("Multiprocessing", mp_results, t_sequential)
         
     # 3. Futures
     futures_results = []
@@ -91,20 +96,22 @@ def run_benchmark():
         results.append(entry)
         futures_results.append(entry)
         
-    print_mode_table("Futures", futures_results)
+    print_mode_table("Futures", futures_results, t_sequential)
         
     # Final Analysis
     print("FINAL SUMMARY")
-    print(f"{'Mode':<20} | {'Workers':<10} | {'Time (s)':<10} | {'Speedup':<10} | {'Efficiency':<10}")
-    print("-" * 75)
+    header = f"{'Mode':<20} | {'Workers':<10} | {'Time (s)':<10} | {'Actual S':<10} | {'Theo S':<10} | {'Diff':<10} | {'Estimated P':<10} | {'Efficiency':<10}"
+    print(header)
+    print("-" * len(header))
     
     for mode, workers, duration in results:
-        speedup = metrics.calculate_amdahl_speedup(workers)
-        efficiency = metrics.calculate_efficiency(speedup, workers)
+        actual_speedup = metrics.calculate_actual_speedup(t_sequential, duration)
+        theo_speedup = metrics.calculate_theoretical_speedup(workers)
+        diff = theo_speedup - actual_speedup
+        p_val = metrics.calculate_parallel_fraction(actual_speedup, workers)
+        efficiency = metrics.calculate_efficiency(actual_speedup, workers)
             
-        speedup_str = f"{speedup:.2f}x"
-        efficiency_str = f"{efficiency:.2f}"
-        print(f"{mode:<20} | {workers:<10} | {duration:<10.4f} | {speedup_str:<10} | {efficiency_str:<10}")
+        print(f"{mode:<20} | {workers:<10} | {duration:<10.4f} | {actual_speedup:<10.2f} | {theo_speedup:<10.2f} | {diff:<10.2f} | {p_val:<10.4f} | {efficiency:<10.2f}")
     print("="*75)
 
 if __name__ == "__main__":
