@@ -38,12 +38,6 @@ python scripts/benchmark.py
 
 Outputs will be saved to `data/processed`.
 
-## Key Features
-
-- **Accumulated Output**: Processed images from all benchmark runs (Sequential, Multiprocessing, Futures) are saved with unique prefixes (e.g., `processed_mp_4_image.jpg`) to the `data/processed` directory.
-- **Intermediate Results**: Performance tables are printed after each mode completes, providing real-time feedback.
-- **Robust Cleanup**: Includes retry logic for directory cleanup to handle Windows file locking.
-
 ## Performance Metrics
 
 The benchmark calculates both **Actual Speedup** and **Theoretical Speedup** to analyze performance.
@@ -98,4 +92,5 @@ The ThreadPoolExecutor implementation uses threads within a single Python proces
 - Diminishing returns as thread count increases
 
 Some speedup is still observed at low thread counts because certain operations such as I/O or underlying C extensions may temporarily release the GIL. However, beyond a small number of threads, overhead dominates and overall performance degrades.
+
 
