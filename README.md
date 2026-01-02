@@ -61,15 +61,15 @@ Where:
 ## Results Summary
 | Paradigm | Workers | Time (s) | Actual Speedup | Theoretical Speedup | Efficiency | P Value | 
 |----------|---------|----------|---------|------------|---------|---------|
-| Sequential | 1 | 30.1993 | 1.00 | 1.00 | 100.0% | 1.0000 |
-| Multiprocessing | 2 | 15.2065 | 1.99 | 1.82 | 99.5%  | 0.9929 | 
-| Multiprocessing | 4 | 7.6327 | 3.96 | 3.08 | 99.0%  | 0.9963 | 
-| Multiprocessing | 8 | 3.9748 | 7.60 | 4.71 | 95.0% | 0.9924 |
-| Multiprocessing | 16 | 2.2967 | 13.15 | 6.40 | 82.2% | 0.9855 |
-| Futures | 2 | 14.9852 | 2.02 | 1.82 | 101.0% | 1.0076* |
-| Futures | 4 | 9.4734 | 3.19 | 3.08 | 79.8% | 0.9151 |
-| Futures | 8 | 8.5799 | 3.52 | 4.71 | 44.0% | 0.8182 |
-| Futures | 16 | 10.2706 | 2.94 | 6.40 | 18.4% | 0.7039 |
+| Sequential | 1 | 30.1993 | 1.00x | 1.00x | 100.0% | 1.0000 |
+| Multiprocessing | 2 | 15.2065 | 1.99x | 1.82x | 99.5%  | 0.9929 | 
+| Multiprocessing | 4 | 7.6327 | 3.96x | 3.08x | 99.0%  | 0.9963 | 
+| Multiprocessing | 8 | 3.9748 | 7.60x | 4.71x | 95.0% | 0.9924 |
+| Multiprocessing | 16 | 2.2967 | 13.15x | 6.40x | 82.2% | 0.9855 |
+| Futures | 2 | 14.9852 | 2.02x | 1.82x | 101.0% | 1.0076* |
+| Futures | 4 | 9.4734 | 3.19x | 3.08x | 79.8% | 0.9151 |
+| Futures | 8 | 8.5799 | 3.52x | 4.71x | 44.0% | 0.8182 |
+| Futures | 16 | 10.2706 | 2.94x | 6.40x | 18.4% | 0.7039 |
 
 ## Explanation of Results
 
@@ -108,6 +108,7 @@ The image processing pipeline is sufficiently I/O-bound or uses enough C extensi
 The theoretical speedup predicted by Amdahl’s Law for 16 workers is significantly lower (approximately 6.40×) than the experimentally observed speedup. It indicates that the estimated sequential fraction 𝑓 derived from the theoretical model is conservative.
 
 Amdahl’s Law assumes uniform workload distribution, constant memory behavior, and no cache effects. In practice, the experimental system benefits from improved CPU cache locality, operating system file caching, and reduced per-process interpreter overhead when multiple processes execute concurrently. As a result, the theoretical model underestimates observed performance due to conservative assumptions of uniform workload and constant memory behavior.
+
 
 
 
