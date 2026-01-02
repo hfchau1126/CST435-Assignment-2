@@ -15,7 +15,7 @@ def gaussian_blur(image_array):
     kernel = np.array([[1, 2, 1], [2, 4, 2], [1, 2, 1]]) / 16.0
     return apply_convolution(image_array, kernel)
 
-# Apply Sobel Edge Detection.
+# Apply Sobel Edge Detection
 def sobel_edge_detection(image_array):
     # Convert to grayscale first if needed
     if len(image_array.shape) == 3:
