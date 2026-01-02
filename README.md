@@ -90,7 +90,7 @@ ThreadPoolExecutor achieved significant speedup (up to 3.52x) despite Python's G
 
 **Root Cause Investigation:**
 1. **Image Processing Libraries**: OpenCV and NumPy release the GIL during C-level operations
-2. **I/O-Bound Nature**: Image loading/saving dominates computation time
+2. **I/O-Bound Nature**: Image loading and saving dominates computation time
 3. **GIL Bypass**: Heavy computation happens in C extensions, not Python bytecode
 
 **Evidence:**
@@ -105,6 +105,7 @@ The image processing pipeline is sufficiently I/O-bound or uses enough C extensi
 The theoretical speedup predicted by Amdahl’s Law for 16 workers is significantly lower (approximately 6.40×) than the experimentally observed speedup. It indicates that the estimated sequential fraction 𝑓 derived from the theoretical model is conservative.
 
 Amdahl’s Law assumes uniform workload distribution, constant memory behavior, and no cache effects. In practice, the experimental system benefits from improved CPU cache locality, operating system file caching, and reduced per-process interpreter overhead when multiple processes execute concurrently. As a result, the theoretical model underestimates observed performance due to conservative assumptions of uniform workload and constant memory behavior.
+
 
 
 
