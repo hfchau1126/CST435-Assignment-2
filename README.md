@@ -85,12 +85,19 @@ This result is entirely reasonable and does not indicate super-linear speedup. S
 - Execution time increases when using more than 8 threads.
 - Efficiency drops sharply at higher thread counts.
 
-The ThreadPoolExecutor implementation uses threads within a single Python process. In CPython, threads are constrained by the Global Interpreter Lock (GIL), which allows only one thread to execute Python bytecode at a time. Since the image processing pipeline is primarily CPU-bound, this leads to:
+ThreadPoolExecutor achieved significant speedup (up to 3.52x) despite Python's Global Interpreter Lock (GIL).
 
-- Limited true parallelism
-- Increased context switching overhead
-- Diminishing returns as thread count increases
+**Root Cause Investigation:**
+1. **Image Processing Libraries**: OpenCV and NumPy release the GIL during C-level operations
+2. **I/O-Bound Nature**: Image loading/saving dominates computation time
+3. **GIL Bypass**: Heavy computation happens in C extensions, not Python bytecode
 
-Some speedup is still observed at low thread counts because certain operations such as I/O or underlying C extensions may temporarily release the GIL. However, beyond a small number of threads, overhead dominates and overall performance degrades.
+**Evidence:**
+- Pure Python CPU-bound threads would show ~1.0x speedup
+- Measured 2.02-3.52x speedup indicates GIL is not the bottleneck
+- Performance degrades at 16 workers due to thread contention, not GIL
+
+**Conclusion:** The image processing pipeline is sufficiently I/O-bound or uses enough C extensions that ThreadPoolExecutor provides meaningful parallelism despite Python's GIL.
+
 
 
