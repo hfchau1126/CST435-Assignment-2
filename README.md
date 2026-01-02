@@ -78,13 +78,24 @@ Where:
 
 ### Multiprocessing Results
 
-The multiprocessing implementation shows strong and consistent scalability:
+- Speedup increases steadily as the number of workers increases.
+- At 16 workers, a speedup of approximately 13× is achieved.
+- Efficiency remains high (above 80%) at larger worker counts.
 
-Speedup increases steadily as the number of workers increases
-
-At 16 workers, a speedup of approximately 13× is achieved
-
-Efficiency remains high (above 80%) at larger worker counts
+This result is entirely reasonable and does not indicate super-linear speedup. Since the number of workers is less than the available vCPUs, no hardware oversubscription occurs.The observed speedup being lower than the ideal linear speedup of 16 is expected and healthy. It reflects unavoidable overheads, including sequential sections of the program, inter-process communication costs, and operating system scheduling overhead. Given the use of Python multiprocessing, image I/O, and a cloud virtualized environment, an efficiency above 80% indicates good task granularity and effective utilization of available compute resources.
 
 ### Concurrent.futures Results
+
+- Speedup improves slightly at low thread counts.
+- Performance saturates around 3–4× speedup.
+- Execution time increases when using more than 8 threads.
+- Efficiency drops sharply at higher thread counts.
+
+The ThreadPoolExecutor implementation uses threads within a single Python process. In CPython, threads are constrained by the Global Interpreter Lock (GIL), which allows only one thread to execute Python bytecode at a time. Since the image processing pipeline is primarily CPU-bound, this leads to:
+
+- Limited true parallelism
+- Increased context switching overhead
+- Diminishing returns as thread count increases
+
+Some speedup is still observed at low thread counts because certain operations such as I/O or underlying C extensions may temporarily release the GIL. However, beyond a small number of threads, overhead dominates and overall performance degrades.
 
