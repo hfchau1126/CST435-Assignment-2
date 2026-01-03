@@ -105,9 +105,10 @@ ThreadPoolExecutor achieved significant speedup (up to 3.52x) despite Python's G
 The image processing pipeline is sufficiently I/O-bound or uses enough C extensions that ThreadPoolExecutor provides meaningful parallelism despite Python's GIL.
 
 ## Why Experimental Speedup Exceeds Theoretical Amdahl Speedup
-The theoretical speedup predicted by Amdahl’s Law for 16 workers is significantly lower (approximately 6.40×) than the experimentally observed speedup. It indicates that the estimated sequential fraction 𝑓 derived from the theoretical model (f=0.1) is conservative.
+The experimental speedup observed on Google Cloud Platform is higher than that obtained from local execution and exceeds the theoretical speedup predicted by Amdahl’s Law (approximately 6.40×). The GCP virtual machine provides a significantly larger number of available vCPUs, reduced resource contention, and a more stable runtime environment compared to a typical local system. As a result, worker processes can execute truly in parallel without oversubscription which leads to higher effective CPU utilization.
 
-Amdahl’s Law assumes uniform workload distribution, constant memory behavior, and no cache effects. In practice, the experimental system benefits from improved CPU cache locality, operating system file caching, and reduced per-process interpreter overhead when multiple processes execute concurrently. As a result, the theoretical model underestimates observed performance due to conservative assumptions of uniform workload and constant memory behavior.
+Theoretical models such as Amdahl’s Law rely on simplified assumptions and conservative estimates of the sequential fraction, and they do not account for hardware-level optimizations, caching effects, or runtime behavior. Consequently, real-world experimental performance may exceed theoretical predictions without violating parallel computing principles.
+
 
 
 
