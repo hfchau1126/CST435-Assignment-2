@@ -127,3 +127,4 @@ Theoretical models such as Amdahl’s Law rely on simplified assumptions and con
 
 
 
+
