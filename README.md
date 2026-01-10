@@ -18,7 +18,7 @@ This project implements a parallel image processing pipeline that applies a sequ
 - `config.yaml`: Configuration settings
 - `requirements.txt`: Python dependencies
 
-Note: The Food-101 dataset is not included in the GitHub repository due to its size.
+Note: The data folder is not included in the GitHub repository due to its size.
 
 ## Setup
 
@@ -116,6 +116,7 @@ The primary bottleneck for both implementations is the serial fraction, includin
 The experimental speedup observed on Google Cloud Platform is higher than that obtained from local execution and exceeds the theoretical speedup predicted by Amdahl’s Law (approximately 6.40×). The GCP virtual machine provides a significantly larger number of available vCPUs, reduced resource contention, and a more stable runtime environment compared to a typical local system. As a result, worker processes can execute truly in parallel without oversubscription which leads to higher effective CPU utilization.
 
 Theoretical models such as Amdahl’s Law rely on simplified assumptions and conservative estimates of the sequential fraction, and they do not account for hardware-level optimizations, caching effects, or runtime behavior. Consequently, real-world experimental performance may exceed theoretical predictions without violating parallel computing principles.
+
 
 
 
