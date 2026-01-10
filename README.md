@@ -104,6 +104,12 @@ ThreadPoolExecutor achieved significant speedup (up to 3.52x) despite Python's G
 **Summary:** 
 The image processing pipeline is sufficiently I/O-bound or uses enough C extensions that ThreadPoolExecutor provides meaningful parallelism despite Python's GIL.
 
+## Scalability Analysis
+Scalability is assessed by the reduction in execution time as worker count increases on the GCP instance. The multiprocessing implementation exhibits strong scalability, with speedup increasing from 1.99× at 2 workers to 13.15× at 16 workers, while maintaining high efficiency. In contrast, the concurrent.futures implementation shows limited scalability, achieving reasonable performance only up to 4 workers before efficiency drops sharply to 44% at 8 workers and 18% at 16 workers. This difference arises from architectural design: multiprocessing uses process-based parallelism that bypasses Python’s Global Interpreter Lock (GIL), enabling near-linear scaling, whereas concurrent.futures relies on thread-based parallelism that is increasingly constrained by GIL contention at higher worker counts.
+
+## Bottlenecks
+The primary bottleneck for both implementations is the serial fraction, including disk I/O and image decoding/encoding, which limits achievable speedup as predicted by Amdahl’s Law. For multiprocessing, efficiency decreases from 95.0% at 8 workers to 82.2% at 16 workers, indicating diminishing returns as I/O and coordination overheads dominate. A secondary bottleneck is hardware saturation: scaling beyond the available 8 CPU cores introduces context switching, inter-process communication, and memory contention, reducing efficiency. In the concurrent.futures implementation, bottlenecks are dominated by GIL contention, where increased thread counts lead to scheduling overhead and reduced parallel effectiveness, causing performance degradation at higher worker counts.
+
 ## Why Experimental Speedup Exceeds Theoretical Amdahl Speedup
 The experimental speedup observed on Google Cloud Platform is higher than that obtained from local execution and exceeds the theoretical speedup predicted by Amdahl’s Law (approximately 6.40×). The GCP virtual machine provides a significantly larger number of available vCPUs, reduced resource contention, and a more stable runtime environment compared to a typical local system. As a result, worker processes can execute truly in parallel without oversubscription which leads to higher effective CPU utilization.
 
