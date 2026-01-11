@@ -4,6 +4,7 @@ import random
 
 # Create a subset of the dataset by copying 10 images from each class folder
 def create_subset(source_root, dest_root, images_per_class=None, total_images=None):
+ 
     images_dir = os.path.join(source_root, 'food-101', 'images')
     
     if not os.path.exists(images_dir):
@@ -20,6 +21,7 @@ def create_subset(source_root, dest_root, images_per_class=None, total_images=No
     base_count = 0
     remainder = 0
     
+    # Calculate how many images to take from each class
     if total_images is not None and num_classes > 0:
         base_count = total_images // num_classes
         remainder = total_images % num_classes
@@ -33,6 +35,7 @@ def create_subset(source_root, dest_root, images_per_class=None, total_images=No
     
     for i, cls in enumerate(classes):
         current_limit = base_count
+        # Distribute the extra images among the first few classes
         if i < remainder:
             current_limit += 1
             
@@ -44,6 +47,7 @@ def create_subset(source_root, dest_root, images_per_class=None, total_images=No
         
         for img_name in selected:
             src_path = os.path.join(src_class_dir, img_name)
+            # Prefix filename with class name to avoid collision and preserve label info
             new_name = f"{cls}_{img_name}"
             dst_path = os.path.join(dest_root, new_name)
             shutil.copy2(src_path, dst_path)
@@ -52,23 +56,12 @@ def create_subset(source_root, dest_root, images_per_class=None, total_images=No
     print(f"Successfully created subset with {total_copied} images in {dest_root}")
 
 if __name__ == "__main__":
-    source = "data"
+    source = "C:/Users/waipe/OneDrive/Desktop"
     dest = "data/raw"
     target_total = 1000
     
-    if os.path.exists(dest) and os.listdir(dest):
-        print(f"Folder {dest} is not empty. No need to extract.")
-    else:
-        if os.path.exists(dest):
-             print(f"Clearing {dest}...")
-             shutil.rmtree(dest)
-        os.makedirs(dest)
-        create_subset(source, dest, total_images=target_total)
-
-    print("\nProceeding to benchmark...")
-    try:
-        import benchmark
-        benchmark.run_benchmark()
-    except ImportError:
-        print("Could not import benchmark module directly. Attempting to run via subprocess or check paths.")
-        pass
+    if os.path.exists(dest):
+         print(f"Clearing {dest}...")
+         shutil.rmtree(dest)
+    os.makedirs(dest)
+    create_subset(source, dest, total_images=target_total)
