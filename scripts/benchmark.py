@@ -14,6 +14,7 @@ from src import utils
 from src import metrics
 
 def load_config(config_path="config.yaml"):
+
     try:
         with open(config_path, 'r') as f:
             return yaml.safe_load(f)
@@ -22,6 +23,7 @@ def load_config(config_path="config.yaml"):
         return {"input_path": "data", "output_path": "data/processed"}
 
 def run_benchmark():
+
     config = load_config()
     input_dir = config.get("input_path", "data")
     output_dir = config.get("output_path", "data/processed")
@@ -38,6 +40,7 @@ def run_benchmark():
 
     # Helper to print intermediate tables
     def print_mode_table(title, subset_results, t_seq):
+ 
         print(f"\nResults for {title}")
         header = f"{'Workers':<10} | {'Time (s)':<10} | {'Actual S':<10} | {'Theo S':<10} | {'Diff':<10} | {'Estimated P':<10} | {'Efficiency':<10}"
         print(header)
@@ -52,6 +55,7 @@ def run_benchmark():
             
             print(f"{workers:<10} | {duration:<10.4f} | {actual_speedup:<10.2f} | {theo_speedup:<10.2f} | {diff:<10.2f} | {p_val:<10.4f} | {efficiency:<10.2f}")
 
+    # Clean up previous output directory to ensure fair write performance
     if os.path.exists(output_dir):
         for i in range(3):
             try:
@@ -78,7 +82,7 @@ def run_benchmark():
     
     # 2. Multiprocessing
     mp_results = []
-    for workers in [2, 4, 8, 16]:
+    for workers in [2, 4, 8, 16, 32]:
         print(f"\n--- Running Multiprocessing (Workers={workers}) ---")
         duration = multiprocessing_module.run_multiprocessing(images, output_dir, workers, prefix="mp")
         entry = ("Multiprocessing", workers, duration)
@@ -89,7 +93,7 @@ def run_benchmark():
         
     # 3. Futures
     futures_results = []
-    for workers in [2, 4, 8, 16]:
+    for workers in [2, 4, 8, 16, 32]:
         print(f"\n--- Running Futures (Workers={workers}) ---")
         duration = concurrent_futures_module.run_futures(images, output_dir, workers, prefix="futures")
         entry = ("Futures", workers, duration)
