@@ -3,6 +3,7 @@ from PIL import Image
 
 # Convert RGB image to grayscale
 def to_grayscale(image_array):
+
     if len(image_array.shape) == 2:
         return image_array 
     
@@ -12,11 +13,13 @@ def to_grayscale(image_array):
 
 # Apply 3x3 Gaussian Blur
 def gaussian_blur(image_array):
+
     kernel = np.array([[1, 2, 1], [2, 4, 2], [1, 2, 1]]) / 16.0
     return apply_convolution(image_array, kernel)
 
 # Apply Sobel Edge Detection
 def sobel_edge_detection(image_array):
+
     # Convert to grayscale first if needed
     if len(image_array.shape) == 3:
         gray = to_grayscale(image_array)
@@ -35,17 +38,20 @@ def sobel_edge_detection(image_array):
 
 # Sharpen image using a kernel
 def sharpen(image_array):
+
     kernel = np.array([[0, -1, 0], [-1, 5, -1], [0, -1, 0]])
     return apply_convolution(image_array, kernel)
 
 # Adjust brightness by a factor
 def adjust_brightness(image_array, factor=1.2):
+
     adjusted = image_array * factor
     adjusted = np.clip(adjusted, 0, 255)
     return adjusted.astype(np.uint8)
 
 # Apply convolution to an image 
 def apply_convolution(image_array, kernel):
+
     if len(image_array.shape) == 3:
         # RGB
         r = apply_convolution_2d(image_array[:,:,0], kernel)
@@ -58,6 +64,7 @@ def apply_convolution(image_array, kernel):
 
 # Simple 2D convolution implementation
 def apply_convolution_2d(image_2d, kernel):
+
     pad_height = kernel.shape[0] // 2
     pad_width = kernel.shape[1] // 2
     
@@ -67,7 +74,7 @@ def apply_convolution_2d(image_2d, kernel):
     if kernel.shape == (3, 3):
         p = padded.astype(float)
         
-        # Slices
+        # Slices for vectorization
         top_left = p[:-2, :-2]
         top_mid = p[:-2, 1:-1]
         top_right = p[:-2, 2:]
@@ -91,6 +98,7 @@ def apply_convolution_2d(image_2d, kernel):
         raise NotImplementedError("Only 3x3 kernel supported for this optimization.")
 
 def apply_filters(image_array):
+
     if image_array is None:
         return None
         
