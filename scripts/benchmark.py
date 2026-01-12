@@ -82,7 +82,7 @@ def run_benchmark():
     
     # 2. Multiprocessing
     mp_results = []
-    for workers in [2, 4, 8, 16, 32]:
+    for workers in [2, 4, 8, 16]:
         print(f"\n--- Running Multiprocessing (Workers={workers}) ---")
         duration = multiprocessing_module.run_multiprocessing(images, output_dir, workers, prefix="mp")
         entry = ("Multiprocessing", workers, duration)
@@ -93,7 +93,7 @@ def run_benchmark():
         
     # 3. Futures
     futures_results = []
-    for workers in [2, 4, 8, 16, 32]:
+    for workers in [2, 4, 8, 16]:
         print(f"\n--- Running Futures (Workers={workers}) ---")
         duration = concurrent_futures_module.run_futures(images, output_dir, workers, prefix="futures")
         entry = ("Futures", workers, duration)
@@ -120,3 +120,4 @@ def run_benchmark():
 
 if __name__ == "__main__":
     run_benchmark()
+
