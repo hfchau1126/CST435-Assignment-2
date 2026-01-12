@@ -56,7 +56,7 @@ def create_subset(source_root, dest_root, images_per_class=None, total_images=No
     print(f"Successfully created subset with {total_copied} images in {dest_root}")
 
 if __name__ == "__main__":
-    source = "C:/Users/waipe/OneDrive/Desktop"
+    source = "data"
     dest = "data/raw"
     target_total = 1000
     
@@ -65,3 +65,4 @@ if __name__ == "__main__":
          shutil.rmtree(dest)
     os.makedirs(dest)
     create_subset(source, dest, total_images=target_total)
+
