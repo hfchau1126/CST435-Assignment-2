@@ -33,6 +33,24 @@ def run_benchmark():
         return
 
     images = utils.get_image_files(input_dir)
+    
+    if not images:
+        print(f"No images found in {input_dir}. Auto-generating subset...")
+        try:
+            import create_subset
+            # Default to 1000 images if not specified
+            create_subset.create_subset(source_root="data", dest_root=input_dir, total_images=1000)
+            images = utils.get_image_files(input_dir)
+            if not images:
+                print("Error: create_subset failed to generate images.")
+                return
+        except ImportError:
+            print("Error: Could not import create_subset script.")
+            return
+        except Exception as e:
+            print(f"Error generating subset: {e}")
+            return
+            
     num_images = len(images)
     print(f"Running benchmark with {num_images} images from {input_dir}...")
 
@@ -120,4 +138,3 @@ def run_benchmark():
 
 if __name__ == "__main__":
     run_benchmark()
-
